@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+	"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+<title>Web client of the Attempto Parsing Engine (APE) web service</title>
+
+<meta name="Author" content="Kaarel Kaljurand"/>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+
+<link rel="stylesheet" type="text/css" href="cape.css"/>
+
+<script type="text/javascript" src="cape.js"></script>
+<script type="text/javascript" src="query.js"></script>
+<script type="text/javascript" src="controls.js"></script>
+<script type="text/javascript" src="regtest.js"></script>
+<script type="text/javascript" src="ext.js"></script>
+<script type="text/javascript" src="apeitem.js"></script>
+
+<script src="http://www.google-analytics.com/urchin.js" type="text/javascript"> </script>
+<script type="text/javascript">
+	_uacct = "UA-115096-2";
+	urchinTracker();
+</script>
+
+</head>
+
+
+<body onload="init()">
+
+<div id="busyLight" class="hidden">Processing...</div>
+<div style="margin-bottom: 0.5em;">
+<button id="menuButton" onclick="minimize()" title="Toggle menu on and off.">Show menu</button>
+<button id="helpButton" onclick="window.open('../site/docs/ape_webclient_help.html','help_window','toolbar=no, location=no, directories=no, status=no, menubar=no, scrollbars=yes, resizable=yes, width=850, height=600');" title="Show help.">Help</button>
+</div>
+
+<table id="menu" class="hidden">
+
+<tr>
+<td class="menuLabel">Show</td>
+<td class="nowrap">
+<input id="displayInput" type="checkbox" checked="checked" title="Output the input text."/>Input text
+<input id="displayParaphrase" type="checkbox" checked="checked" title="Output the paraphrase of the input text."/>Paraphrase
+<input id="displayDrspp" type="checkbox" checked="checked" title="Output the DRS of the input text."/>DRS
+<input id="displayDrsxml" type="checkbox" title="Output the XML version of DRS of the input text."/>DRS XML
+<input id="displayFol" type="checkbox" title="Output the standard first-order logic representation (default form) of the input text."/>FOL
+<input id="displayTptp" type="checkbox" title="Output the TPTP representation of the input text."/>TPTP
+<input id="displayOwlfsspp" type="checkbox" title="Output the OWL (Functional-Style Syntax) representation of the input text."/>OWL FSS
+<input id="displayOwlxml" type="checkbox" title="Output the OWL (XML) representation of the input text."/>OWL XML
+<input id="displayTokens" type="checkbox" title="Output the tokenization of the input text."/>Tokens
+<input id="displaySyntaxpp" type="checkbox" title="Output the syntax trees of the input text."/>Syntax
+</td></tr>
+
+<tr>
+<td>Options</td>
+<td>
+<input id="guess" type="checkbox" title="Guess the word class of unknown words."/>Guess unknown words
+<input id="noclex" type="checkbox" title="Do not use Clex (a large lexicon of common English words)"/>Do not use Clex
+</td>
+</tr>
+
+<tr id="lexiconField">
+<td class="menuLabel">Lexicon</td>
+<td class="nowrap">
+	<input id="lexicon" type="text" name="lexicon" size="60" title="Enter the web address of the user lexicon." value=""/>
+	<input id="reloadLexicon" type="checkbox" title="Reload the user lexicon from the given web address."/>Reload the lexicon from URL
+</td>
+</tr>
+
+</table>
+
+<table class="controls">
+<tr><td id="infoLine"> </td></tr>
+<tr>
+<td>
+<textarea
+	id="acetext"
+	name="acetext"
+	title="Enter an ACE text."
+	rows="6"
+	cols="80">
+</textarea>
+</td>
+</tr>
+
+<tr>
+<td>
+<button
+	id="up"
+	type="button"
+	title="Go to older entry. You can also use a keyboard shortcut Ctrl-&uarr;."
+	onclick="ui.older()">&uarr;</button>
+
+<button
+	id="down"
+	type="button"
+	title="Go to newer entry. You can also use a keyboard shortcut Ctrl-&darr;."
+	onclick="ui.newer()">&darr;</button>
+
+<button
+	id="analyse"
+	type="button"
+	title="Analyse the text with APE. You can also use a keyboard shortcut Ctrl-Enter."
+	class="s4"
+	onclick="ui.go()">Analyse</button>
+</td>
+</tr>
+</table>
+
+<table id="serviceSelect" class="hidden">
+<tr>
+<td>APE service:
+<select id="url" size="1" title="Choose a service.">
+<option selected="selected">http://attempto.ifi.uzh.ch/ws/ape/apews.perl</option>
+<option>http://attempto.ifi.uzh.ch/ws/ape-alpha/apews.perl</option>
+<option>http://localhost/ws/ape-alpha/apews.perl</option>
+<option>http://localhost:8000/</option>
+</select>
+</td>
+</tr>
+<tr><td><input id="displayRuleml" type="checkbox" title="Display the DRS in RuleML"/>RuleML
+<input id="displayParaphrase1" type="checkbox" title="Show the paraphrase which uses sentences."/>Paraphrase1
+<input id="displayParaphrase2" type="checkbox" title="Show the paraphrase which uses relative clauses."/>Paraphrase2
+<input id="displayPnf" type="checkbox" title="Output the standard first-order logic representation (prenex normal form) of the input text."/>PNF
+<input id="displayOwlrdf" type="checkbox" title="Output the OWL (RDF/XML) representation of the input text."/>OWL RDF/XML</td>
+</tr>
+<tr>
+<td>
+<button
+	id="analyseSelection"
+	type="button"
+	title="Analyse the selected text with APE."
+	class="s4"
+	onclick="analyseSelection()">Analyse selection</button>
+
+<button
+	id="format"
+	type="button"
+	title="Format the ACE text."
+	onclick="ui.format()">Format</button></td>
+</tr>
+<tr>
+	<td>
+		<button onclick="ui.modelAppend()">Append to model</button>
+		<button onclick="ui.modelOverwrite()">Overwrite model</button>
+		<button onclick="ui.modelShow()">Show model</button>
+	</td>
+</tr>
+</table>
+
+<div id="results"> </div>
+
+</body>
+</html>
